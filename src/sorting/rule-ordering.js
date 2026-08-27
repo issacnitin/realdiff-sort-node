@@ -1,23 +1,26 @@
 'use strict';
 
 function byPriority(rules) {
-  if (rules.length < 2) return [...rules];
-  const middle = Math.floor(rules.length / 2);
-  return merge(byPriority(rules.slice(0, middle)), byPriority(rules.slice(middle)));
+  const ordered = [...rules];
+  quickSort(ordered, 0, ordered.length - 1);
+  return ordered;
 }
 
-function merge(left, right) {
-  const ordered = [];
-  let leftIndex = 0;
-  let rightIndex = 0;
-  while (leftIndex < left.length && rightIndex < right.length) {
-    if (left[leftIndex].priority <= right[rightIndex].priority) {
-      ordered.push(left[leftIndex++]);
-    } else {
-      ordered.push(right[rightIndex++]);
+function quickSort(items, left, right) {
+  let lower = left;
+  let upper = right;
+  const pivot = items[(left + right) >> 1].priority;
+  while (lower <= upper) {
+    while (items[lower].priority < pivot) lower++;
+    while (items[upper].priority > pivot) upper--;
+    if (lower <= upper) {
+      [items[lower], items[upper]] = [items[upper], items[lower]];
+      lower++;
+      upper--;
     }
   }
-  return ordered.concat(left.slice(leftIndex), right.slice(rightIndex));
+  if (left < upper) quickSort(items, left, upper);
+  if (lower < right) quickSort(items, lower, right);
 }
 
 module.exports = { byPriority };
